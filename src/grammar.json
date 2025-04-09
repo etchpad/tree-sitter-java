@@ -7708,63 +7708,48 @@
       "value": "[\\p{XID_Start}_$][\\p{XID_Continue}\\u00A2_$]*"
     },
     "line_comment": {
-      "type": "PREC",
-      "value": 0,
+      "type": "TOKEN",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "//"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "line_comment_body"
-          }
-        ]
-      }
-    },
-    "line_comment_body": {
-      "type": "PATTERN",
-      "value": "[^\\n]*"
-    },
-    "comment": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "line_comment"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "block_comment"
+        "type": "PREC",
+        "value": 0,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "//"
+            },
+            {
+              "type": "PATTERN",
+              "value": "[^\\n]*"
+            }
+          ]
         }
-      ]
+      }
     },
     "block_comment": {
-      "type": "PREC",
-      "value": 0,
+      "type": "TOKEN",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "/*"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "block_comment_body"
-          },
-          {
-            "type": "STRING",
-            "value": "/"
-          }
-        ]
+        "type": "PREC",
+        "value": 0,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "/*"
+            },
+            {
+              "type": "PATTERN",
+              "value": "[^*]*\\*+([^/*][^*]*\\*+)*"
+            },
+            {
+              "type": "STRING",
+              "value": "/"
+            }
+          ]
+        }
       }
-    },
-    "block_comment_body": {
-      "type": "PATTERN",
-      "value": "[^*]*\\*+([^/*][^*]*\\*+)*"
     },
     "whitespace_inline": {
       "type": "PATTERN",
@@ -7773,81 +7758,6 @@
     "whitespace_block": {
       "type": "PATTERN",
       "value": "\\s*?(\\r\\n|\\r|\\n)+"
-    },
-    "_leading_extras": {
-      "type": "REPEAT",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_leading_comments"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "whitespace_inline"
-          }
-        ]
-      }
-    },
-    "_leading_comments": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "comment"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "whitespace_block"
-        }
-      ]
-    },
-    "_trailing_extras": {
-      "type": "PREC",
-      "value": -1,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "whitespace_block"
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "whitespace_inline"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              },
-              {
-                "type": "SYMBOL",
-                "name": "comment"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "whitespace_block"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
     }
   },
   "extras": [
@@ -7939,7 +7849,6 @@
     "_type",
     "_simple_type",
     "_unannotated_type",
-    "comment",
     "module_directive",
     "top_level_declaration"
   ]

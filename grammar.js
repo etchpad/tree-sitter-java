@@ -17,7 +17,6 @@ const HEX_DIGITS = token(sep1(/[A-Fa-f0-9]+/, '_'));
 
 const PREC = {
   // https://introcs.cs.princeton.edu/java/11precedence/
-  LEADING: -1,
   COMMENT: 0,         // //  /*  */
   ASSIGN: 1,          // =  += -=  *=  /=  %=  &=  ^=  |=  <<=  >>=  >>>=
   DECL: 2,
@@ -63,7 +62,6 @@ module.exports = grammar({
     $._type,
     $._simple_type,
     $._unannotated_type,
-    $.comment,
     $.module_directive,
     $.top_level_declaration,
   ],
@@ -1287,57 +1285,21 @@ module.exports = grammar({
     // https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-IdentifierChars
     identifier: _ => /[\p{XID_Start}_$][\p{XID_Continue}\u00A2_$]*/,
 
-    line_comment: $ => prec(PREC.COMMENT, seq('//', $.line_comment_body)),
+    line_comment: _ => token(prec(PREC.COMMENT, seq('//', /[^\n]*/))),
 
-    line_comment_body: $ => /[^\n]*/,
     // http://stackoverflow.com/questions/13014947/regex-to-match-a-c-style-multiline-comment/36328890#36328890
-    comment: $ => choice(
-      $.line_comment,
-      $.block_comment,
-    ),
-
-    line_comment: $ => prec(PREC.COMMENT, seq('//', $.line_comment_body)),
-
-    line_comment_body: $ => /[^\n]*/,
-
-    block_comment: $ => prec(PREC.COMMENT,
+    block_comment: _ => token(prec(PREC.COMMENT,
       seq(
         '/*',
-        $.block_comment_body,
+        /[^*]*\*+([^/*][^*]*\*+)*/,
         '/',
       ),
-    ),
-
-    block_comment_body: $ => /[^*]*\*+([^/*][^*]*\*+)*/,
+    )),
 
     whitespace_inline: $ => /[ \t]+/,
 
     // Trailing whitespace needs to end with newlines or carriage returns so that a new line is started ready for the leading extras
     whitespace_block: $ => /\s*?(\r\n|\r|\n)+/,
-
-    _leading_extras: $ => repeat(
-      choice(
-        $._leading_comments,
-        $.whitespace_inline, // Leading spaces on the same line. Could be the start of a line or could be midway
-      )
-    ),
-
-    // Comments that precede anything, regardless of the amount of whitespace afterwards, are attached to that element
-    _leading_comments: $ => seq(
-      $.comment,
-      $.whitespace_block,
-    ),
-
-    _trailing_extras: $ => prec(PREC.LEADING, choice(
-        $.whitespace_block,
-        // Trailing comments are only captured at the end of an element if they start on the same line, followed by any other block of whitespace
-        seq(
-          optional($.whitespace_inline),
-          $.comment,
-          optional($.whitespace_block),
-        )
-      )
-    ),
   }
 });
 
